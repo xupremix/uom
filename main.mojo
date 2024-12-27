@@ -1,5 +1,8 @@
 from uom.prelude import *
 
+
 fn main():
-    var l: Length[meter] = 1609.344
-    print(l.to[mile]())
+    var a: QLength[meter] = 1609.344
+    var b: QLength[mile] = a
+    b += a
+    print(b)
