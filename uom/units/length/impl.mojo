@@ -4,6 +4,8 @@ from .units import LengthUnits
 from uom.units.time.impl import Time
 from uom.units.velocity.impl import Velocity
 
+from utils._visualizers import lldb_formatter_wrapping_type
+
 @value
 struct Length[
     unit: Unit
