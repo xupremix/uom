@@ -1,5 +1,7 @@
 from uom.unit import Unit, Units
-from uom.conversion import Conversions, Triple
+from uom.conversion import Conversions, Conv
+from .time import *
+from .velocity import *
 
 struct millimeter(Unit):
     @staticmethod
@@ -21,17 +23,24 @@ alias LengthUnits = Units[
 ]
 
 alias LengthConversions = Conversions[
-    Triple[millimeter, millimeter, _, 1],
-    Triple[millimeter, meter, _, 1e-3],
-    Triple[millimeter, kilometer, _, 1e-6],
+    Conv[millimeter, millimeter, _, 1],
+    Conv[millimeter, meter, _, 1e-3],
+    Conv[millimeter, kilometer, _, 1e-6],
 
-    Triple[meter, millimeter, _, 1e3],
-    Triple[meter, meter, _, 1],
-    Triple[meter, kilometer, _, 1e-3],
+    Conv[meter, millimeter, _, 1e3],
+    Conv[meter, meter, _, 1],
+    Conv[meter, kilometer, _, 1e-3],
 
-    Triple[kilometer, millimeter, _, 1e6],
-    Triple[kilometer, meter, _, 1e3],
-    Triple[kilometer, kilometer, _, 1],
+    Conv[kilometer, millimeter, _, 1e6],
+    Conv[kilometer, meter, _, 1e3],
+    Conv[kilometer, kilometer, _, 1],
+]
+
+alias ToVelocityConversions = Conversions[
+    Conv[meter, second, meter_per_second],
+    Conv[meter, hour, meter_per_hour],
+    Conv[kilometer, second, kilometer_per_second],
+    Conv[kilometer, hour, kilometer_per_hour],
 ]
 
 @value
@@ -120,3 +129,13 @@ struct Length[
     
     fn __isub__(mut self, rhs: IntLiteral):
         self.repr -= float(rhs)
+    
+    # TODO change error message from Conversions to take in an arbitrary string literal?
+    # or just make it less specific
+    fn __truediv__[Rhs: Unit](self, rhs: Time[Rhs])
+        -> Velocity[
+            ToVelocityConversions.__conversions[
+                ToVelocityConversions.find[unit, Rhs]()
+            ].Type
+        ]:
+        return self.repr / rhs.repr

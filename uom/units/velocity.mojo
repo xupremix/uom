@@ -1,5 +1,5 @@
 from uom.unit import Unit, Units
-from uom.conversion import Conversions, Triple
+from uom.conversion import Conversions, Conv
 
 struct meter_per_second(Unit):
     @staticmethod
@@ -26,25 +26,25 @@ alias VelocityUnits = Units[
 ]
 
 alias VelocityConversions = Conversions[
-    Triple[meter_per_second, meter_per_second, _, 1],
-    Triple[meter_per_second, meter_per_hour, _, 3600],
-    Triple[meter_per_second, kilometer_per_second, _, 1e-3],
-    Triple[meter_per_second, kilometer_per_hour, _, 3.6],
+    Conv[meter_per_second, meter_per_second, _, 1],
+    Conv[meter_per_second, meter_per_hour, _, 3600],
+    Conv[meter_per_second, kilometer_per_second, _, 1e-3],
+    Conv[meter_per_second, kilometer_per_hour, _, 3.6],
 
-    Triple[meter_per_hour, meter_per_second, _, 1 / 3600],
-    Triple[meter_per_hour, meter_per_hour, _, 1],
-    Triple[meter_per_hour, kilometer_per_second, _, 1 / 36e5],
-    Triple[meter_per_hour, kilometer_per_hour, _, 1e-3],
+    Conv[meter_per_hour, meter_per_second, _, 1 / 3600],
+    Conv[meter_per_hour, meter_per_hour, _, 1],
+    Conv[meter_per_hour, kilometer_per_second, _, 1 / 36e5],
+    Conv[meter_per_hour, kilometer_per_hour, _, 1e-3],
 
-    Triple[kilometer_per_second, meter_per_second, _, 1e3],
-    Triple[kilometer_per_second, meter_per_hour, _, 36e5],
-    Triple[kilometer_per_second, kilometer_per_second, _, 1],
-    Triple[kilometer_per_second, kilometer_per_hour, _, 3600],
+    Conv[kilometer_per_second, meter_per_second, _, 1e3],
+    Conv[kilometer_per_second, meter_per_hour, _, 36e5],
+    Conv[kilometer_per_second, kilometer_per_second, _, 1],
+    Conv[kilometer_per_second, kilometer_per_hour, _, 3600],
 
-    Triple[kilometer_per_hour, meter_per_second, _, 1 / 3.6],
-    Triple[kilometer_per_hour, meter_per_hour, _, 1e3],
-    Triple[kilometer_per_hour, kilometer_per_second, _, 1 / 3600],
-    Triple[kilometer_per_hour, kilometer_per_hour, _, 1],
+    Conv[kilometer_per_hour, meter_per_second, _, 1 / 3.6],
+    Conv[kilometer_per_hour, meter_per_hour, _, 1e3],
+    Conv[kilometer_per_hour, kilometer_per_second, _, 1 / 3600],
+    Conv[kilometer_per_hour, kilometer_per_hour, _, 1],
 ]
 
 @value

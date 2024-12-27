@@ -1,7 +1,7 @@
 from uom.prelude import *
 
 fn main():
-    var v: Length[meter] = 24 * 60
-    var v2: Length[millimeter] = 2e5
-    ris = v + v2 + 200
-    print(ris.to[kilometer]())
+    var l: Length[meter] = 60
+    var t: Time[second] = 20
+    ris = l / t
+    print(ris.to[kilometer_per_hour]())

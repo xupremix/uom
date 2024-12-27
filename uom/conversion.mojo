@@ -6,13 +6,13 @@ from .unit import Unit
 trait Conversion:
     alias From: Unit
     alias To: Unit
-    alias Type: AnyType
+    alias Type: Unit
     alias Value: Float64
 
-struct Triple[
+struct Conv[
     _from: Unit,
     _to: Unit,
-    _type: AnyType = _from,
+    _type: Unit = _from,
     _value: Float64 = 0,
 ](Conversion):
     alias From = _from
