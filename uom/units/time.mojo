@@ -1,24 +1,29 @@
-from uom.unit import Unit
+from uom.unit import Unit, Units
 from uom.conversion import Conversions, Triple
 
-trait TimeUnit(Unit): ...
-
-struct second(TimeUnit):
+struct second(Unit):
     @staticmethod
     fn to_string() -> String:
         return "second"
-struct minute(TimeUnit):
+struct minute(Unit):
     @staticmethod
     fn to_string() -> String:
         return "minute"
-struct hour(TimeUnit):
+struct hour(Unit):
     @staticmethod
     fn to_string() -> String:
         return "hour"
-struct day(TimeUnit):
+struct day(Unit):
     @staticmethod
     fn to_string() -> String:
         return "day"
+
+alias TimeUnits = Units[
+    second,
+    minute,
+    hour,
+    day,
+]
 
 alias TimeConversions = Conversions[
     Triple[second, second, _, 1],
@@ -44,22 +49,34 @@ alias TimeConversions = Conversions[
 
 @value
 struct Time[
-    unit: TimeUnit
+    unit: Unit
 ](Writable):
     var repr: Float64
 
     @implicit
     fn __init__(out self, repr: IntLiteral):
+        constrained[
+            TimeUnits.find[unit](),
+            "\nCannot use type \"" + unit.to_string() + "\" to create a \"Time\" instance."
+        ]()
         self.repr = float(repr)
 
     @implicit
     fn __init__[F: Floatable](out self, repr: F):
+        constrained[
+            TimeUnits.find[unit](),
+            "\nCannot use type \"" + unit.to_string() + "\" to create a \"Time\" instance."
+        ]()
         self.repr = float(repr)
     
     fn write_to[W: Writer](self, mut w: W):
         w.write(unit.to_string() + "[" + str(self.repr) + "]")
 
-    fn to[U: TimeUnit](self) -> Time[U]:
+    fn to[U: Unit](self) -> Time[U]:
+        constrained[
+            TimeUnits.find[U](),
+            "\nCannot use type \"" + unit.to_string() + "\" to create a \"Time\" instance."
+        ]()
         alias multiplier = TimeConversions.__conversions[
             TimeConversions.find[unit, U]()
         ].Value
@@ -67,13 +84,13 @@ struct Time[
 
     # ADDITION
     
-    fn __add__[Rhs: TimeUnit](self, rhs: Time[Rhs]) -> Self:
+    fn __add__[Rhs: Unit](self, rhs: Time[Rhs]) -> Self:
         alias multiplier = TimeConversions.__conversions[
             TimeConversions.find[Rhs, unit]()
         ].Value
         return self.repr + rhs.repr * multiplier
     
-    fn __iadd__[Rhs: TimeUnit](mut self, rhs: Time[Rhs]):
+    fn __iadd__[Rhs: Unit](mut self, rhs: Time[Rhs]):
         alias multiplier = TimeConversions.__conversions[
             TimeConversions.find[Rhs, unit]()
         ].Value
@@ -93,13 +110,13 @@ struct Time[
 
     # SUBTRACTION
 
-    fn __sub__[Rhs: TimeUnit](self, rhs: Time[Rhs]) -> Self:
+    fn __sub__[Rhs: Unit](self, rhs: Time[Rhs]) -> Self:
         alias multiplier = TimeConversions.__conversions[
             TimeConversions.find[Rhs, unit]()
         ].Value
         return self.repr - rhs.repr * multiplier
     
-    fn __isub__[Rhs: TimeUnit](mut self, rhs: Time[Rhs]):
+    fn __isub__[Rhs: Unit](mut self, rhs: Time[Rhs]):
         alias multiplier = TimeConversions.__conversions[
             TimeConversions.find[Rhs, unit]()
         ].Value
@@ -116,56 +133,3 @@ struct Time[
     
     fn __isub__(mut self, rhs: IntLiteral):
         self.repr -= float(rhs)
-
-    # # MULTIPLICATION
-    
-    # fn __mul__[Rhs: TimeUnit](self, rhs: Time[Rhs]) -> Self:
-    #     alias multiplier = TimeConversions.__conversions[
-    #         TimeConversions.find[Rhs, unit]()
-    #     ].Value
-    #     return self.repr * rhs.repr * multiplier
-    
-    # fn __imul__[Rhs: TimeUnit](mut self, rhs: Time[Rhs]):
-    #     alias multiplier = TimeConversions.__conversions[
-    #         TimeConversions.find[Rhs, unit]()
-    #     ].Value
-    #     self.repr *= rhs.repr * multiplier
-
-    # fn __mul__[F: Floatable](self, rhs: F) -> Self:
-    #     return self.repr * float(rhs)
-    
-    # fn __imul__[F: Floatable](mut self, rhs: F):
-    #     self.repr *= float(rhs)
-
-    # fn __mul__(self, rhs: IntLiteral) -> Self:
-    #     return self.repr * float(rhs)
-    
-    # fn __imul__(mut self, rhs: IntLiteral):
-    #     self.repr *= float(rhs)
-    
-    # # DIVISION
-    # # TODO: check for division by zero
-
-    # fn __truediv__[Rhs: TimeUnit](self, rhs: Time[Rhs]) -> Self:
-    #     alias multiplier = TimeConversions.__conversions[
-    #         TimeConversions.find[Rhs, unit]()
-    #     ].Value
-    #     return self.repr / rhs.repr * multiplier
-    
-    # fn __itruediv__[Rhs: TimeUnit](mut self, rhs: Time[Rhs]):
-    #     alias multiplier = TimeConversions.__conversions[
-    #         TimeConversions.find[Rhs, unit]()
-    #     ].Value
-    #     self.repr /= rhs.repr * multiplier
-
-    # fn __truediv__[F: Floatable](self, rhs: F) -> Self:
-    #     return self.repr / float(rhs)
-    
-    # fn __itruediv__[F: Floatable](mut self, rhs: F):
-    #     self.repr /= float(rhs)
-
-    # fn __truediv__(self, rhs: IntLiteral) -> Self:
-    #     return self.repr / float(rhs)
-    
-    # fn __itruediv__(mut self, rhs: IntLiteral):
-    #     self.repr /= float(rhs)

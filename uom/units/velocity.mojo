@@ -57,7 +57,7 @@ struct Velocity[
     fn __init__(out self, repr: IntLiteral):
         constrained[
             VelocityUnits.find[unit](),
-            "\nCannot use type " + unit.to_string() + " to create a \"Velocity\""
+            "\nCannot use type \"" + unit.to_string() + "\" to create a \"Velocity\" instance."
         ]()
         self.repr = float(repr)
 
@@ -65,7 +65,7 @@ struct Velocity[
     fn __init__[F: Floatable](out self, repr: F):
         constrained[
             VelocityUnits.find[unit](),
-            "\nCannot use type " + unit.to_string() + " to create a \"Velocity\""
+            "\nCannot use type \"" + unit.to_string() + "\" to create a \"Velocity\" instance."
         ]()
         self.repr = float(repr)
     
@@ -75,7 +75,7 @@ struct Velocity[
     fn to[U: Unit](self) -> Velocity[U]:
         constrained[
             VelocityUnits.find[U](),
-            "\nCannot use type " + U.to_string() + " to create a \"Velocity\""
+            "\nCannot use type \"" + U.to_string() + "\" to create a \"Velocity\" instance."
         ]()
         alias multiplier = VelocityConversions.__conversions[
             VelocityConversions.find[unit, U]()
@@ -85,20 +85,12 @@ struct Velocity[
     # ADDITION
     
     fn __add__[Rhs: Unit](self, rhs: Velocity[Rhs]) -> Self:
-        constrained[
-            VelocityUnits.find[Rhs](),
-            "\nCannot use type " + Rhs.to_string() + " to create a \"Velocity\""
-        ]()
         alias multiplier = VelocityConversions.__conversions[
             VelocityConversions.find[Rhs, unit]()
         ].Value
         return self.repr + rhs.repr * multiplier
     
     fn __iadd__[Rhs: Unit](mut self, rhs: Velocity[Rhs]):
-        constrained[
-            VelocityUnits.find[Rhs](),
-            "\nCannot use type " + Rhs.to_string() + " to create a \"Velocity\""
-        ]()
         alias multiplier = VelocityConversions.__conversions[
             VelocityConversions.find[Rhs, unit]()
         ].Value
@@ -119,20 +111,12 @@ struct Velocity[
     # SUBTRACTION
 
     fn __sub__[Rhs: Unit](self, rhs: Velocity[Rhs]) -> Self:
-        constrained[
-            VelocityUnits.find[Rhs](),
-            "\nCannot use type " + Rhs.to_string() + " to create a \"Velocity\""
-        ]()
         alias multiplier = VelocityConversions.__conversions[
             VelocityConversions.find[Rhs, unit]()
         ].Value
         return self.repr - rhs.repr * multiplier
     
     fn __isub__[Rhs: Unit](mut self, rhs: Velocity[Rhs]):
-        constrained[
-            VelocityUnits.find[Rhs](),
-            "\nCannot use type " + Rhs.to_string() + " to create a \"Velocity\""
-        ]()
         alias multiplier = VelocityConversions.__conversions[
             VelocityConversions.find[Rhs, unit]()
         ].Value

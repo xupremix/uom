@@ -1,20 +1,24 @@
-from uom.unit import Unit
+from uom.unit import Unit, Units
 from uom.conversion import Conversions, Triple
 
-trait LengthUnit(Unit): ...
-
-struct millimeter(LengthUnit):
+struct millimeter(Unit):
     @staticmethod
     fn to_string() -> String:
         return "millimeter"
-struct meter(LengthUnit):
+struct meter(Unit):
     @staticmethod
     fn to_string() -> String:
         return "meter"
-struct kilometer(LengthUnit):
+struct kilometer(Unit):
     @staticmethod
     fn to_string() -> String:
         return "kilometer"
+
+alias LengthUnits = Units[
+    millimeter,
+    meter,
+    kilometer,
+]
 
 alias LengthConversions = Conversions[
     Triple[millimeter, millimeter, _, 1],
@@ -32,22 +36,34 @@ alias LengthConversions = Conversions[
 
 @value
 struct Length[
-    unit: LengthUnit
+    unit: Unit
 ](Writable):
     var repr: Float64
 
     @implicit
     fn __init__(out self, repr: IntLiteral):
+        constrained[
+            LengthUnits.find[unit](),
+            "\nCannot use type \"" + unit.to_string() + "\" to create a \"Length\" instance."
+        ]()
         self.repr = float(repr)
 
     @implicit
     fn __init__[F: Floatable](out self, repr: F):
+        constrained[
+            LengthUnits.find[unit](),
+            "\nCannot use type \"" + unit.to_string() + "\" to create a \"Length\" instance."
+        ]()
         self.repr = float(repr)
     
     fn write_to[W: Writer](self, mut w: W):
         w.write(unit.to_string() + "[" + str(self.repr) + "]")
 
-    fn to[U: LengthUnit](self) -> Length[U]:
+    fn to[U: Unit](self) -> Length[U]:
+        constrained[
+            LengthUnits.find[U](),
+            "\nCannot use type \"" + unit.to_string() + "\" to create a \"Length\" instance."
+        ]()
         alias multiplier = LengthConversions.__conversions[
             LengthConversions.find[unit, U]()
         ].Value
@@ -55,13 +71,13 @@ struct Length[
 
     # ADDITION
     
-    fn __add__[Rhs: LengthUnit](self, rhs: Length[Rhs]) -> Self:
+    fn __add__[Rhs: Unit](self, rhs: Length[Rhs]) -> Self:
         alias multiplier = LengthConversions.__conversions[
             LengthConversions.find[Rhs, unit]()
         ].Value
         return self.repr + rhs.repr * multiplier
     
-    fn __iadd__[Rhs: LengthUnit](mut self, rhs: Length[Rhs]):
+    fn __iadd__[Rhs: Unit](mut self, rhs: Length[Rhs]):
         alias multiplier = LengthConversions.__conversions[
             LengthConversions.find[Rhs, unit]()
         ].Value
@@ -81,13 +97,13 @@ struct Length[
 
     # SUBTRACTION
 
-    fn __sub__[Rhs: LengthUnit](self, rhs: Length[Rhs]) -> Self:
+    fn __sub__[Rhs: Unit](self, rhs: Length[Rhs]) -> Self:
         alias multiplier = LengthConversions.__conversions[
             LengthConversions.find[Rhs, unit]()
         ].Value
         return self.repr - rhs.repr * multiplier
     
-    fn __isub__[Rhs: LengthUnit](mut self, rhs: Length[Rhs]):
+    fn __isub__[Rhs: Unit](mut self, rhs: Length[Rhs]):
         alias multiplier = LengthConversions.__conversions[
             LengthConversions.find[Rhs, unit]()
         ].Value
@@ -104,56 +120,3 @@ struct Length[
     
     fn __isub__(mut self, rhs: IntLiteral):
         self.repr -= float(rhs)
-
-    # # MULTIPLICATION
-    
-    # fn __mul__[Rhs: LengthUnit](self, rhs: Length[Rhs]) -> Self:
-    #     alias multiplier = LengthConversions.__conversions[
-    #         LengthConversions.find[Rhs, unit]()
-    #     ].Value
-    #     return self.repr * rhs.repr * multiplier
-    
-    # fn __imul__[Rhs: LengthUnit](mut self, rhs: Length[Rhs]):
-    #     alias multiplier = LengthConversions.__conversions[
-    #         LengthConversions.find[Rhs, unit]()
-    #     ].Value
-    #     self.repr *= rhs.repr * multiplier
-
-    # fn __mul__[F: Floatable](self, rhs: F) -> Self:
-    #     return self.repr * float(rhs)
-    
-    # fn __imul__[F: Floatable](mut self, rhs: F):
-    #     self.repr *= float(rhs)
-
-    # fn __mul__(self, rhs: IntLiteral) -> Self:
-    #     return self.repr * float(rhs)
-    
-    # fn __imul__(mut self, rhs: IntLiteral):
-    #     self.repr *= float(rhs)
-    
-    # # DIVISION
-    # # TODO: check for division by zero
-
-    # fn __truediv__[Rhs: LengthUnit](self, rhs: Length[Rhs]) -> Self:
-    #     alias multiplier = LengthConversions.__conversions[
-    #         LengthConversions.find[Rhs, unit]()
-    #     ].Value
-    #     return self.repr / rhs.repr * multiplier
-    
-    # fn __itruediv__[Rhs: LengthUnit](mut self, rhs: Length[Rhs]):
-    #     alias multiplier = LengthConversions.__conversions[
-    #         LengthConversions.find[Rhs, unit]()
-    #     ].Value
-    #     self.repr /= rhs.repr * multiplier
-
-    # fn __truediv__[F: Floatable](self, rhs: F) -> Self:
-    #     return self.repr / float(rhs)
-    
-    # fn __itruediv__[F: Floatable](mut self, rhs: F):
-    #     self.repr /= float(rhs)
-
-    # fn __truediv__(self, rhs: IntLiteral) -> Self:
-    #     return self.repr / float(rhs)
-    
-    # fn __itruediv__(mut self, rhs: IntLiteral):
-    #     self.repr /= float(rhs)
