@@ -30,28 +30,21 @@ struct Length[
         w.write(unit.to_string() + "[" + str(self.repr) + "]")
 
     fn to[U: Unit](self) -> Length[U]:
-        constrained[
-            LengthUnits.find[U](),
-            "\nCannot use type \"" + unit.to_string() + "\" to create a \"Length\" instance."
-        ]()
-        alias multiplier = LengthConversions.__conversions[
-            LengthConversions.find[unit, U]()
-        ].Value
-        return self.repr * multiplier
+        alias mul = LengthConversions.multiplier[unit]() / 
+                    LengthConversions.multiplier[U]()
+        return self.repr * mul
 
     # ADDITION
     
     fn __add__[Rhs: Unit](self, rhs: Length[Rhs]) -> Self:
-        alias multiplier = LengthConversions.__conversions[
-            LengthConversions.find[Rhs, unit]()
-        ].Value
-        return self.repr + rhs.repr * multiplier
+        alias mul = LengthConversions.multiplier[Rhs]() / 
+                    LengthConversions.multiplier[unit]()
+        return self.repr + rhs.repr * mul
     
     fn __iadd__[Rhs: Unit](mut self, rhs: Length[Rhs]):
-        alias multiplier = LengthConversions.__conversions[
-            LengthConversions.find[Rhs, unit]()
-        ].Value
-        self.repr += rhs.repr * multiplier
+        alias mul = LengthConversions.multiplier[Rhs]() / 
+                    LengthConversions.multiplier[unit]()
+        self.repr += rhs.repr * mul
 
     fn __add__[F: Floatable](self, rhs: F) -> Self:
         return self.repr + float(rhs)
@@ -68,16 +61,14 @@ struct Length[
     # SUBTRACTION
 
     fn __sub__[Rhs: Unit](self, rhs: Length[Rhs]) -> Self:
-        alias multiplier = LengthConversions.__conversions[
-            LengthConversions.find[Rhs, unit]()
-        ].Value
-        return self.repr - rhs.repr * multiplier
+        alias mul = LengthConversions.multiplier[Rhs]() / 
+                    LengthConversions.multiplier[unit]()
+        return self.repr - rhs.repr * mul
     
     fn __isub__[Rhs: Unit](mut self, rhs: Length[Rhs]):
-        alias multiplier = LengthConversions.__conversions[
-            LengthConversions.find[Rhs, unit]()
-        ].Value
-        self.repr -= rhs.repr * multiplier
+        alias mul = LengthConversions.multiplier[Rhs]() / 
+                    LengthConversions.multiplier[unit]()
+        self.repr -= rhs.repr * mul
 
     fn __sub__[F: Floatable](self, rhs: F) -> Self:
         return self.repr + float(rhs)
@@ -95,7 +86,7 @@ struct Length[
     # or just make it less specific
     fn __truediv__[Rhs: Unit](self, rhs: Time[Rhs])
         -> Velocity[
-            ToVelocityConversions.__conversions[
+            ToVelocityConversions.get_conv[
                 ToVelocityConversions.find[unit, Rhs]()
             ].Type
         ]:

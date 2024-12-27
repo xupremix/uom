@@ -28,28 +28,21 @@ struct Time[
         w.write(unit.to_string() + "[" + str(self.repr) + "]")
 
     fn to[U: Unit](self) -> Time[U]:
-        constrained[
-            TimeUnits.find[U](),
-            "\nCannot use type \"" + unit.to_string() + "\" to create a \"Time\" instance."
-        ]()
-        alias multiplier = TimeConversions.__conversions[
-            TimeConversions.find[unit, U]()
-        ].Value
-        return self.repr * multiplier
+        alias mul = TimeConversions.multiplier[unit]() / 
+                    TimeConversions.multiplier[U]()
+        return self.repr * mul
 
     # ADDITION
     
     fn __add__[Rhs: Unit](self, rhs: Time[Rhs]) -> Self:
-        alias multiplier = TimeConversions.__conversions[
-            TimeConversions.find[Rhs, unit]()
-        ].Value
-        return self.repr + rhs.repr * multiplier
+        alias mul = TimeConversions.multiplier[Rhs]() / 
+                    TimeConversions.multiplier[unit]()
+        return self.repr + rhs.repr * mul
     
     fn __iadd__[Rhs: Unit](mut self, rhs: Time[Rhs]):
-        alias multiplier = TimeConversions.__conversions[
-            TimeConversions.find[Rhs, unit]()
-        ].Value
-        self.repr += rhs.repr * multiplier
+        alias mul = TimeConversions.multiplier[Rhs]() / 
+                    TimeConversions.multiplier[unit]()
+        self.repr += rhs.repr * mul
 
     fn __add__[F: Floatable](self, rhs: F) -> Self:
         return self.repr + float(rhs)
@@ -66,16 +59,14 @@ struct Time[
     # SUBTRACTION
 
     fn __sub__[Rhs: Unit](self, rhs: Time[Rhs]) -> Self:
-        alias multiplier = TimeConversions.__conversions[
-            TimeConversions.find[Rhs, unit]()
-        ].Value
-        return self.repr - rhs.repr * multiplier
+        alias mul = TimeConversions.multiplier[Rhs]() / 
+                    TimeConversions.multiplier[unit]()
+        return self.repr - rhs.repr * mul
     
     fn __isub__[Rhs: Unit](mut self, rhs: Time[Rhs]):
-        alias multiplier = TimeConversions.__conversions[
-            TimeConversions.find[Rhs, unit]()
-        ].Value
-        self.repr -= rhs.repr * multiplier
+        alias mul = TimeConversions.multiplier[Rhs]() / 
+                    TimeConversions.multiplier[unit]()
+        self.repr -= rhs.repr * mul
 
     fn __sub__[F: Floatable](self, rhs: F) -> Self:
         return self.repr + float(rhs)

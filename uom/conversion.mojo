@@ -3,45 +3,71 @@ from sys.intrinsics import _type_is_eq
 from collections import Optional
 from .unit import Unit
 
+"""
+Here the multiplier is going from a given Unit to the Base.
+For example for the length:
+- base = meter
+so for a millimeter the multiplier will be 1e-3
+"""
 trait Conversion:
-    alias From: Unit
-    alias To: Unit
+    alias Lhs: Unit
+    alias multiplier: Float64
+    alias Rhs: Unit
     alias Type: Unit
-    alias Value: Float64
 
 struct Conv[
-    _from: Unit,
-    _to: Unit,
-    _type: Unit = _from,
-    _value: Float64 = 0,
+    _lhs: Unit,
+    _multiplier: Float64 = 0,
+    _rhs: Unit = _lhs,
+    _type: Unit = _lhs,
 ](Conversion):
-    alias From = _from
-    alias To = _to
+    alias Lhs = _lhs
+    alias multiplier = _multiplier
+    alias Rhs = _rhs
     alias Type = _type
-    alias Value = _value
 
 struct Conversions[
     *C: Conversion
 ]:
-    alias __conversions = C
+    alias get_conv = C
     alias length = len(VariadicList(C))
 
     @parameter
     @staticmethod
-    fn find[From: Unit, To: Unit]() -> UInt:
+    fn multiplier[U: Unit]() -> Float64:
         @parameter
-        fn wrapper[From: Unit, To: Unit]() -> Optional[UInt]:
+        fn wrapper[U: Unit]() -> Optional[Float64]:
             @parameter
             for i in range(Self.length):
                 alias conv = C[i]
                 @parameter
-                if _type_is_eq[From, conv.From]() and _type_is_eq[To, conv.To]():
-                    return Optional[UInt](UInt(i))
-            return Optional[UInt](None)
-        alias out = wrapper[From, To]()
+                if _type_is_eq[U, conv.Lhs]():
+                    return Optional(conv.multiplier)
+            return None
+        alias out = wrapper[U]()
         constrained[
             out.__bool__(),
-            "\nCould not find an available conversion from " + From.to_string() +
-            " to " + To.to_string() + "."
+            "\nCould not find type \"" + U.to_string() + "\""
+        ]()
+        return out.value()
+
+
+    @parameter
+    @staticmethod
+    fn find[Lhs: Unit, Rhs: Unit]() -> UInt:
+        @parameter
+        fn wrapper[Lhs: Unit, Rhs: Unit]() -> Optional[UInt]:
+            @parameter
+            for i in range(Self.length):
+                alias conv = C[i]
+                @parameter
+                if _type_is_eq[Lhs, conv.Lhs]() and _type_is_eq[Rhs, conv.Rhs]():
+                    return Optional(UInt(i))
+            return None
+        alias out = wrapper[Lhs, Rhs]()
+        constrained[
+            out.__bool__(),
+            "\nCould not find an available conversion with " + Lhs.to_string() +
+            " and " + Rhs.to_string() + "."
         ]()
         return out.value()
