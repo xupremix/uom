@@ -1,47 +1,8 @@
-from uom.unit import Unit, Units
-from uom.conversion import Conversions, Conv
-from .time import *
-from .velocity import *
-
-struct millimeter(Unit):
-    @staticmethod
-    fn to_string() -> String:
-        return "millimeter"
-struct meter(Unit):
-    @staticmethod
-    fn to_string() -> String:
-        return "meter"
-struct kilometer(Unit):
-    @staticmethod
-    fn to_string() -> String:
-        return "kilometer"
-
-alias LengthUnits = Units[
-    millimeter,
-    meter,
-    kilometer,
-]
-
-alias LengthConversions = Conversions[
-    Conv[millimeter, millimeter, _, 1],
-    Conv[millimeter, meter, _, 1e-3],
-    Conv[millimeter, kilometer, _, 1e-6],
-
-    Conv[meter, millimeter, _, 1e3],
-    Conv[meter, meter, _, 1],
-    Conv[meter, kilometer, _, 1e-3],
-
-    Conv[kilometer, millimeter, _, 1e6],
-    Conv[kilometer, meter, _, 1e3],
-    Conv[kilometer, kilometer, _, 1],
-]
-
-alias ToVelocityConversions = Conversions[
-    Conv[meter, second, meter_per_second],
-    Conv[meter, hour, meter_per_hour],
-    Conv[kilometer, second, kilometer_per_second],
-    Conv[kilometer, hour, kilometer_per_hour],
-]
+from uom.unit import Unit
+from .conversions import LengthConversions, ToVelocityConversions
+from .units import LengthUnits
+from uom.units.time.impl import Time
+from uom.units.velocity.impl import Velocity
 
 @value
 struct Length[
