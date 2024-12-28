@@ -3,7 +3,7 @@ trait Dim:
     alias M: Int
     alias T: Int
     alias E: Int
-    alias Th: Int
+    alias H: Int
     alias N: Int
     alias J: Int
 
@@ -12,7 +12,7 @@ struct ISQ[
     m: Int,
     t: Int,
     e: Int,
-    th: Int,
+    h: Int,
     n: Int,
     j: Int,
 ](Dim):
@@ -20,7 +20,7 @@ struct ISQ[
     alias M = m
     alias T = t
     alias E = e
-    alias Th = th
+    alias H = h
     alias N = n
     alias J = j
 
@@ -33,20 +33,20 @@ from .units.velocity.units import VelocityUnits
 fn check_unit_for_dim[U: Unit, D: Dim]() -> Bool:
     return (
         LengthUnits.find[U]() and
-        D.L == 1 and
+        D.L >= 1 and
         D.M == 0 and
         D.T == 0 and 
         D.E == 0 and
-        D.Th == 0 and
+        D.H == 0 and
         D.N == 0 and 
         D.J == 0
     ) or (
         TimeUnits.find[U]() and
         D.L == 0 and
         D.M == 0 and
-        D.T == 1 and 
+        D.T >= 1 and 
         D.E == 0 and
-        D.Th == 0 and
+        D.H == 0 and
         D.N == 0 and 
         D.J == 0
     ) or (
@@ -55,7 +55,7 @@ fn check_unit_for_dim[U: Unit, D: Dim]() -> Bool:
         D.M == 0 and
         D.T == -1 and 
         D.E == 0 and
-        D.Th == 0 and
+        D.H == 0 and
         D.N == 0 and 
         D.J == 0
     )

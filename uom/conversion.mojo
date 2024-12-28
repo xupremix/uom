@@ -191,4 +191,7 @@ alias UnitConversions = Conversions[
     Conv[millimeter_per_minute, 1.666666666666667e-5],
 ]
 
-alias UnitTypeConversions = Conversions
+alias UnitMulTypeConversions = Conversions[
+    Conv[meter, _, mile, meter],
+    Conv[mile, _, meter, mile],
+]
