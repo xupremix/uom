@@ -1,4 +1,5 @@
 from .unit import Unit
+from .units.prelude import *
 
 trait Dim:
     alias L: Int
@@ -62,11 +63,6 @@ struct ISQ[
             ( D.J < 0 and j < 0 ) or
             ( D.J == j )
         )  
-
-from .unit import Unit
-from .units.length.units import LengthUnits
-from .units.time.units import TimeUnits
-from .units.velocity.units import VelocityUnits
 
 @parameter
 fn check_unit_for_dim[U: Unit, D: Dim]() -> Bool:

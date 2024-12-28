@@ -2,6 +2,7 @@ from builtin.constrained import constrained
 from sys.intrinsics import _type_is_eq
 from collections import Optional
 from .unit import Unit
+from .units.prelude import *
 
 """
 Here the multiplier is going from a given Unit to the Base.
@@ -72,9 +73,6 @@ struct Conversions[
         ]()
         return out.value()
 
-from .units.length.units import *
-from .units.time.units import *
-from .units.velocity.units import *
 
 alias UnitConversions = Conversions[
     # Length conversions [meter]
@@ -189,15 +187,4 @@ alias UnitConversions = Conversions[
     Conv[mile_per_minute, 26.8224],
     Conv[mile_per_second, 1609.344],
     Conv[millimeter_per_minute, 1.666666666666667e-5],
-]
-
-alias UnitMulTypeConversions = Conversions[
-    Conv[meter, _, mile, meter],
-    Conv[mile, _, meter, mile],
-]
-
-alias UnitDivTypeConversions = Conversions[
-    Conv[meter, _, mile, meter],
-    Conv[mile, _, meter, mile],
-    Conv[meter, _, second, meter_per_second],
 ]

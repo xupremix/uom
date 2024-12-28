@@ -1,7 +1,9 @@
 from utils._visualizers import lldb_formatter_wrapping_type
 from builtin.constrained import constrained
 from .dimension import Dim, ISQ, check_unit_for_dim
-from .conversion import UnitConversions, UnitMulTypeConversions, UnitDivTypeConversions
+from .conversion import UnitConversions
+from .mul_conversions import UnitMulTypeConversions
+from .div_conversions import UnitDivTypeConversions
 from .unit import Unit
 
 @lldb_formatter_wrapping_type
@@ -94,7 +96,7 @@ struct Quantity[
         ]:
         @parameter
         if dim.same_dim[rhs_dim]():
-            return self.repr * rhs.repr / UnitConversions.multiplier[unit]()
+            return self.repr * rhs.to[unit]().repr
         else:
             return self.repr * rhs.repr
 
@@ -118,12 +120,12 @@ struct Quantity[
         ]:
         @parameter
         if dim.same_dim[rhs_dim]():
-            return self.repr / rhs.repr * UnitConversions.multiplier[unit]()
+            return self.repr / rhs.to[unit]().repr
         else:
             return self.repr / rhs.repr
 
 
-alias QDimensionless = Quantity[ISQ[0, 0, 0, 0, 0, 0, 0]]
-alias QLength = Quantity[ISQ[1, 0, 0, 0, 0, 0, 0]]
-alias QTime = Quantity[ISQ[0, 0, 1, 0, 0, 0, 0]]
-alias QVelocity = Quantity[ISQ[1, 0, -1, 0, 0, 0, 0]]
+alias Dimensionless = Quantity[ISQ[0, 0, 0, 0, 0, 0, 0]]
+alias Length = Quantity[ISQ[1, 0, 0, 0, 0, 0, 0]]
+alias Time = Quantity[ISQ[0, 0, 1, 0, 0, 0, 0]]
+alias Velocity = Quantity[ISQ[1, 0, -1, 0, 0, 0, 0]]
